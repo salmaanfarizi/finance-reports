@@ -18,10 +18,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
+@app.on_event("startup")
+async def startup_event():
+    """Authenticate with Google Sheets on startup."""
+    print("Starting up - attempting Google Sheets authentication...")
+    success = sheets_service.authenticate()
+    if success:
+        print("Successfully authenticated with Google Sheets!")
+    else:
+        print("Warning: Could not authenticate with Google Sheets. Check credentials.")
+
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "http://localhost:3000", "http://localhost:5173"],
+    allow_origins=["*"],  # Allow all origins for now
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,8 +56,8 @@ async def root():
 async def auth_status():
     """Check authentication status."""
     is_auth = sheets_service.is_authenticated()
-    has_credentials = os.path.exists("credentials.json")
-    has_token = os.path.exists("token.json")
+    has_credentials = os.path.exists("credentials.json") or os.getenv("GOOGLE_CREDENTIALS_JSON")
+    has_token = os.path.exists("token.json") or os.getenv("GOOGLE_TOKEN_JSON")
 
     return {
         "authenticated": is_auth,
