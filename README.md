@@ -157,6 +157,49 @@ cd frontend
 npm run build
 ```
 
+## Deployment (Netlify + Railway)
+
+### Frontend on Netlify
+
+1. **Connect to Git**:
+   - Go to [Netlify](https://app.netlify.com)
+   - Click "Add new site" → "Import an existing project"
+   - Connect your GitHub repository
+
+2. **Configure Build**:
+   - Build settings are auto-detected from `netlify.toml`
+   - Base directory: `frontend`
+   - Build command: `npm run build`
+   - Publish directory: `frontend/dist`
+
+3. **Set Environment Variables**:
+   - Go to Site Settings → Environment Variables
+   - Add: `VITE_API_URL` = `https://your-backend-url.railway.app`
+
+4. **Deploy**: Netlify will auto-deploy on every push to main branch
+
+### Backend on Railway
+
+1. Go to [Railway](https://railway.app)
+2. Click "New Project" → "Deploy from GitHub repo"
+3. Select the repository
+4. Configure:
+   - Root Directory: `backend`
+   - Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. Add Environment Variables:
+   - `GOOGLE_SHEET_ID` = your sheet ID
+   - `FRONTEND_URL` = your Netlify URL
+6. Add `credentials.json` content as a secret or use Service Account
+
+### Alternative: Backend on Render
+
+1. Go to [Render](https://render.com)
+2. New → Web Service → Connect repo
+3. Configure:
+   - Root Directory: `backend`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
 ## Troubleshooting
 
 ### "Authentication failed"
