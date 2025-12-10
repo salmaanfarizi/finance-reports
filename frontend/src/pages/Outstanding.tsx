@@ -62,7 +62,7 @@ export function Outstanding() {
     );
   }
 
-  if (!data || data.months.length === 0) {
+  if (!data || !data.months || data.months.length === 0) {
     return (
       <div className="card text-center py-12">
         <p className="text-gray-500">No data available. Please sync data first.</p>
@@ -84,7 +84,8 @@ export function Outstanding() {
     new Intl.NumberFormat('en-SA', { style: 'currency', currency: 'SAR' }).format(value);
 
   // Calculate salesman totals for the table
-  const salesmanTotals = Object.entries(data.salesmen)
+  const salesmanTotals = Object.entries(data.salesmen || {})
+    .filter(([, values]) => Array.isArray(values) && values.length > 0)
     .map(([name, values]) => ({
       name,
       values,
@@ -225,10 +226,10 @@ export function Outstanding() {
             <tr className="bg-yellow-50 font-semibold">
               <td className="px-4 py-3 text-sm text-gray-900">TOTAL</td>
               <td className="px-4 py-3 text-sm text-right text-gray-900">
-                {formatCurrency(data.totals[data.totals.length - 1] || 0)}
+                {formatCurrency((data.totals || [])[data.totals?.length - 1] || 0)}
               </td>
               <td className="px-4 py-3 text-sm text-right text-gray-900">
-                {formatCurrency(data.totals.reduce((a, b) => a + b, 0) / data.totals.length)}
+                {formatCurrency((data.totals || []).length > 0 ? (data.totals || []).reduce((a, b) => a + b, 0) / data.totals.length : 0)}
               </td>
               <td className="px-4 py-3 text-sm text-right text-gray-900">100%</td>
             </tr>

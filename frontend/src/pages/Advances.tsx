@@ -30,7 +30,7 @@ export function Advances() {
     );
   }
 
-  if (!data || data.months.length === 0) {
+  if (!data || !data.months || data.months.length === 0) {
     return (
       <div className="card text-center py-12">
         <p className="text-gray-500">No data available. Please sync data first.</p>
