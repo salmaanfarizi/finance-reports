@@ -143,7 +143,7 @@ export function Outstanding() {
               contentStyle={{ fontSize: 12 }}
             />
             <Legend />
-            {selectedSalesmen.map((salesman, index) => (
+            {selectedSalesmen.map((salesman) => (
               <Line
                 key={salesman}
                 type="monotone"
