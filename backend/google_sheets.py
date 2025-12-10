@@ -1,5 +1,6 @@
 import os
 import re
+import json
 from typing import List, Dict, Any, Optional, Tuple
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -25,20 +26,39 @@ class GoogleSheetsService:
     def authenticate(self) -> bool:
         """Authenticate with Google Sheets API."""
         try:
-            if os.path.exists(GOOGLE_TOKEN_FILE):
+            # Try to load token from environment variable first (for Railway)
+            token_json = os.getenv('GOOGLE_TOKEN_JSON')
+            if token_json:
+                token_data = json.loads(token_json)
+                self.creds = Credentials.from_authorized_user_info(token_data, SCOPES)
+            elif os.path.exists(GOOGLE_TOKEN_FILE):
                 self.creds = Credentials.from_authorized_user_file(GOOGLE_TOKEN_FILE, SCOPES)
 
             if not self.creds or not self.creds.valid:
                 if self.creds and self.creds.expired and self.creds.refresh_token:
                     self.creds.refresh(Request())
+                    # Save refreshed token
+                    if not os.getenv('GOOGLE_TOKEN_JSON'):
+                        with open(GOOGLE_TOKEN_FILE, 'w') as token:
+                            token.write(self.creds.to_json())
                 else:
-                    if not os.path.exists(GOOGLE_CREDENTIALS_FILE):
+                    # Try to get credentials from env or file
+                    creds_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
+                    if creds_json:
+                        creds_data = json.loads(creds_json)
+                        # Write to temp file for OAuth flow
+                        with open('/tmp/credentials.json', 'w') as f:
+                            json.dump(creds_data, f)
+                        flow = InstalledAppFlow.from_client_secrets_file('/tmp/credentials.json', SCOPES)
+                    elif os.path.exists(GOOGLE_CREDENTIALS_FILE):
+                        flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CREDENTIALS_FILE, SCOPES)
+                    else:
+                        print("No credentials found. Please set GOOGLE_TOKEN_JSON env var or provide credentials.json")
                         return False
-                    flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_CREDENTIALS_FILE, SCOPES)
-                    self.creds = flow.run_local_server(port=8080)
 
-                with open(GOOGLE_TOKEN_FILE, 'w') as token:
-                    token.write(self.creds.to_json())
+                    self.creds = flow.run_local_server(port=8080)
+                    with open(GOOGLE_TOKEN_FILE, 'w') as token:
+                        token.write(self.creds.to_json())
 
             self.service = build('sheets', 'v4', credentials=self.creds)
             return True

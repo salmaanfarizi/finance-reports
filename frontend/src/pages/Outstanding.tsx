@@ -31,14 +31,16 @@ export function Outstanding() {
   const loadData = async () => {
     try {
       const res = await comparisonService.getOutstanding();
-      setData(res);
-      // Select top 5 salesmen by default
-      const salesmen = Object.entries(res.salesmen)
-        .map(([name, values]) => ({ name, total: values.reduce((a, b) => a + b, 0) }))
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 5)
-        .map((s) => s.name);
-      setSelectedSalesmen(salesmen);
+      if (res && res.salesmen && res.months) {
+        setData(res);
+        // Select top 5 salesmen by default
+        const salesmen = Object.entries(res.salesmen || {})
+          .map(([name, values]) => ({ name, total: (values || []).reduce((a, b) => a + b, 0) }))
+          .sort((a, b) => b.total - a.total)
+          .slice(0, 5)
+          .map((s) => s.name);
+        setSelectedSalesmen(salesmen);
+      }
     } catch (err) {
       console.error(err);
     } finally {

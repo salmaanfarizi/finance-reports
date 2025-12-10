@@ -94,12 +94,12 @@ export function Banks() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {Object.entries(data.metrics).map(([metric, values]) => (
+            {Object.entries(data.metrics || {}).map(([metric, values]) => (
               <tr key={metric} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm font-medium text-gray-900 capitalize">
                   {metric.replace(/_/g, ' ')}
                 </td>
-                {values.map((value, index) => (
+                {(values || []).map((value, index) => (
                   <td
                     key={index}
                     className={`px-4 py-3 text-sm text-right ${
