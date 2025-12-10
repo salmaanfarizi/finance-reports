@@ -51,23 +51,39 @@ export const dashboardService = {
 
 export const comparisonService = {
   getBanks: async (): Promise<ComparisonData> => {
-    const response = await api.get('/comparison/banks');
-    return response.data;
+    try {
+      const response = await api.get('/comparison/banks');
+      return response.data || { months: [], metrics: {} };
+    } catch {
+      return { months: [], metrics: {} };
+    }
   },
 
   getAdvances: async (): Promise<ComparisonData> => {
-    const response = await api.get('/comparison/advances');
-    return response.data;
+    try {
+      const response = await api.get('/comparison/advances');
+      return response.data || { months: [], metrics: {} };
+    } catch {
+      return { months: [], metrics: {} };
+    }
   },
 
   getSuspense: async (): Promise<ComparisonData> => {
-    const response = await api.get('/comparison/suspense');
-    return response.data;
+    try {
+      const response = await api.get('/comparison/suspense');
+      return response.data || { months: [], metrics: {} };
+    } catch {
+      return { months: [], metrics: {} };
+    }
   },
 
   getOutstanding: async (): Promise<OutstandingComparison> => {
-    const response = await api.get('/comparison/outstanding');
-    return response.data;
+    try {
+      const response = await api.get('/comparison/outstanding');
+      return response.data || { months: [], salesmen: {}, totals: [], mom_changes: [] };
+    } catch {
+      return { months: [], salesmen: {}, totals: [], mom_changes: [] };
+    }
   },
 };
 
