@@ -103,7 +103,7 @@ export function Settings() {
           <div className="card">
             <h3 className="text-lg font-semibold mb-4">Banks</h3>
             <ul className="space-y-2">
-              {settings.banks.map((bank, index) => (
+              {(settings.banks || []).map((bank, index) => (
                 <li
                   key={index}
                   className="px-3 py-2 bg-blue-50 rounded text-sm text-blue-700"
@@ -117,7 +117,7 @@ export function Settings() {
           <div className="card">
             <h3 className="text-lg font-semibold mb-4">Salesmen</h3>
             <ul className="space-y-2">
-              {settings.salesmen.map((salesman, index) => (
+              {(settings.salesmen || []).map((salesman, index) => (
                 <li
                   key={index}
                   className="px-3 py-2 bg-green-50 rounded text-sm text-green-700"
@@ -131,7 +131,7 @@ export function Settings() {
           <div className="card">
             <h3 className="text-lg font-semibold mb-4">Areas</h3>
             <ul className="space-y-2">
-              {settings.areas.map((area, index) => (
+              {(settings.areas || []).map((area, index) => (
                 <li
                   key={index}
                   className="px-3 py-2 bg-purple-50 rounded text-sm text-purple-700"
