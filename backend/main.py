@@ -85,18 +85,24 @@ async def sync_data():
     """Sync all data from Google Sheets."""
     global last_sync_time
 
-    result = sheets_service.sync_all_data()
+    try:
+        result = sheets_service.sync_all_data()
 
-    if result['success']:
-        last_sync_time = datetime.now()
-        return SyncStatus(
-            success=True,
-            message="Data synchronized successfully",
-            last_sync=last_sync_time,
-            sheets_loaded=result['sheets_loaded']
-        )
-    else:
-        raise HTTPException(status_code=500, detail=result.get('error', 'Sync failed'))
+        if result['success']:
+            last_sync_time = datetime.now()
+            return SyncStatus(
+                success=True,
+                message="Data synchronized successfully",
+                last_sync=last_sync_time,
+                sheets_loaded=result['sheets_loaded']
+            )
+        else:
+            raise HTTPException(status_code=500, detail=result.get('error', 'Sync failed'))
+    except Exception as e:
+        import traceback
+        error_detail = f"{str(e)}\n{traceback.format_exc()}"
+        print(f"Sync error: {error_detail}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/sync/status")
@@ -128,6 +134,8 @@ async def get_dashboard():
         kpis = sheets_service.get_dashboard_kpis()
         return kpis.dict()
     except Exception as e:
+        import traceback
+        print(f"Dashboard error: {str(e)}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
