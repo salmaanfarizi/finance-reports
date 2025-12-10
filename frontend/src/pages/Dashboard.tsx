@@ -63,19 +63,19 @@ export function Dashboard() {
 
   // Prepare chart data for banks
   const banksChartData =
-    banksData?.months.map((month, index) => ({
+    (banksData?.months || []).map((month, index) => ({
       month,
-      closing_balance: banksData.metrics.closing_balance?.[index] || 0,
-      total_received: banksData.metrics.total_received?.[index] || 0,
-      total_payments: banksData.metrics.total_payments?.[index] || 0,
-    })) || [];
+      closing_balance: banksData?.metrics?.closing_balance?.[index] || 0,
+      total_received: banksData?.metrics?.total_received?.[index] || 0,
+      total_payments: banksData?.metrics?.total_payments?.[index] || 0,
+    }));
 
   // Prepare chart data for outstanding totals
   const outstandingChartData =
-    outstandingData?.months.map((month, index) => ({
+    (outstandingData?.months || []).map((month, index) => ({
       month,
-      total: outstandingData.totals[index] || 0,
-    })) || [];
+      total: outstandingData?.totals?.[index] || 0,
+    }));
 
   return (
     <div className="space-y-6">
@@ -94,16 +94,16 @@ export function Dashboard() {
           value={kpis.bank_balance}
           color="blue"
           icon={<Building2 className="w-6 h-6 text-blue-600" />}
-          trend={kpis.net_cash_flow > 0 ? 'up' : 'down'}
-          trendValue={`${kpis.net_cash_flow > 0 ? '+' : ''}${(kpis.net_cash_flow / 1000).toFixed(0)}K YTD`}
+          trend={(kpis.net_cash_flow || 0) > 0 ? 'up' : 'down'}
+          trendValue={`${(kpis.net_cash_flow || 0) > 0 ? '+' : ''}${((kpis.net_cash_flow || 0) / 1000).toFixed(0)}K YTD`}
         />
         <KPICard
           title="Total Outstanding"
           value={kpis.total_outstanding}
           color="red"
           icon={<Users className="w-6 h-6 text-red-600" />}
-          trend={kpis.outstanding_growth_rate > 0 ? 'up' : 'down'}
-          trendValue={`${kpis.outstanding_growth_rate > 0 ? '+' : ''}${kpis.outstanding_growth_rate.toFixed(1)}%`}
+          trend={(kpis.outstanding_growth_rate || 0) > 0 ? 'up' : 'down'}
+          trendValue={`${(kpis.outstanding_growth_rate || 0) > 0 ? '+' : ''}${(kpis.outstanding_growth_rate || 0).toFixed(1)}%`}
         />
         <KPICard
           title="Advance Balance"
@@ -137,7 +137,7 @@ export function Dashboard() {
           title="Cash Position"
           value={kpis.cash_position}
           subtitle="Bank - Outstanding"
-          color={kpis.cash_position > 0 ? 'green' : 'red'}
+          color={(kpis.cash_position || 0) > 0 ? 'green' : 'red'}
           icon={<Activity className="w-6 h-6" />}
         />
         <KPICard
